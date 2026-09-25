@@ -1,0 +1,331 @@
+<!doctype html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>لوحة المشاريع</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Firebase (استضافة خارجية مجانية توفر التخزين المشترك) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<style>
+:root{
+  --bg:#EEF1F4; --surface:#FFFFFF; --surface-2:#F4F6F8; --ink:#1C2733; --ink-soft:#66727E;
+  --border:#DEE4E9; --primary:#2F8F82; --primary-ink:#FFFFFF; --accent:#D98E3B; --danger:#C0584A;
+  --col-todo:#8891A0; --col-doing:#3C7FB1; --col-done:#2F8F62; --shadow:0 1px 2px rgba(20,30,40,.06),0 1px 1px rgba(20,30,40,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131A22; --surface:#1B2530; --surface-2:#212C39; --ink:#E7ECF1; --ink-soft:#93A0AD;
+    --border:#2C3A48; --primary:#3FA99A; --accent:#E3A15C; --danger:#D97564; --shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131A22; --surface:#1B2530; --surface-2:#212C39; --ink:#E7ECF1; --ink-soft:#93A0AD;
+  --border:#2C3A48; --primary:#3FA99A; --accent:#E3A15C; --danger:#D97564;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+button,input,select,textarea{font-family:inherit}
+.topbar{
+  position:sticky; top:0; top:env(safe-area-inset-top,0px); z-index:5; background:var(--surface);
+  border-bottom:1px solid var(--border); padding:14px 18px; display:flex; align-items:center; gap:14px;
+}
+.brand{font-weight:700; font-size:17px; display:flex; align-items:center; gap:8px}
+.brand-dot{width:9px;height:9px;border-radius:50%;background:var(--primary)}
+.tabs{display:flex; gap:4px; margin-inline-start:auto}
+.tab{padding:7px 14px; border-radius:8px; border:none; background:transparent; color:var(--ink-soft); cursor:pointer; font-size:14px; font-weight:500}
+.tab.active{background:var(--surface-2); color:var(--ink)}
+.back{border:none;background:none;color:var(--ink-soft);cursor:pointer;font-size:14px;display:flex;align-items:center;gap:4px;padding:6px}
+.wrap{max-width:960px; margin:0 auto; padding:24px 18px 60px; overflow-x:hidden}
+.hd-row{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; gap:10px; flex-wrap:wrap}
+h1{font-size:20px; margin:0}
+h2{font-size:22px;margin:0 0 4px}
+.muted{color:var(--ink-soft); font-size:14px}
+.btn{border:1px solid var(--border); background:var(--surface); color:var(--ink); padding:9px 16px; border-radius:9px; cursor:pointer; font-size:14px; font-weight:500; transition:border-color .15s}
+.btn:hover{border-color:var(--primary)}
+.btn-primary{background:var(--primary); color:var(--primary-ink); border-color:var(--primary)}
+.btn-primary:hover{opacity:.92}
+.btn-danger{color:var(--danger); border-color:var(--danger)}
+.btn-ghost{border:none;background:none;color:var(--ink-soft)}
+.icon-btn{border:none;background:none;color:var(--ink-soft);cursor:pointer;padding:4px;border-radius:6px;font-size:14px}
+.icon-btn:hover{background:var(--surface-2)}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px}
+.p-card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; cursor:pointer; box-shadow:var(--shadow); transition:border-color .15s}
+.p-card:hover{border-color:var(--primary)}
+.p-card h3{margin:0 0 6px; font-size:16px}
+.p-meta{display:flex; justify-content:space-between; align-items:center; margin-top:12px}
+.chips{display:flex; flex-wrap:wrap; gap:5px; margin-top:10px}
+.chip{background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px; font-size:12px; color:var(--ink-soft)}
+.progress{height:6px; border-radius:4px; background:var(--surface-2); overflow:hidden; margin-top:8px}
+.progress-fill{height:100%; background:var(--primary); border-radius:4px}
+.empty{text-align:center; padding:60px 20px; color:var(--ink-soft)}
+.empty h3{color:var(--ink); margin-bottom:6px}
+.board{display:flex; gap:14px; overflow-x:auto; padding-bottom:8px}
+.col{background:var(--surface-2); border-radius:12px; padding:12px; min-width:250px; flex:1}
+.col-head{display:flex; align-items:center; gap:8px; padding:4px 6px 10px; font-weight:600; font-size:14px}
+.dot{width:8px;height:8px;border-radius:50%}
+.count{color:var(--ink-soft); font-weight:400; font-size:13px; margin-inline-start:auto}
+.task{background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:11px 12px; margin-bottom:9px; cursor:pointer; box-shadow:var(--shadow); border-inline-start:3px solid var(--c)}
+.task:hover{border-color:var(--primary)}
+.task-title{font-size:14px; font-weight:500; margin-bottom:7px}
+.task-foot{display:flex; align-items:center; justify-content:space-between; gap:6px}
+.avatar{width:22px;height:22px;border-radius:50%;background:var(--primary);color:var(--primary-ink);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.badge{font-size:11px; padding:2px 8px; border-radius:20px; background:var(--surface-2); color:var(--ink-soft)}
+.badge.due{background:#D98E3B22; color:var(--accent)}
+.badge.late{background:#C0584A22; color:var(--danger)}
+.add-task{width:100%; border:1px dashed var(--border); background:none; border-radius:9px; padding:9px; color:var(--ink-soft); cursor:pointer; font-size:13px; margin-top:2px}
+.add-task:hover{border-color:var(--primary); color:var(--primary)}
+.overlay{position:fixed; inset:0; background:rgba(10,14,18,.45); display:flex; align-items:center; justify-content:center; padding:16px; z-index:20}
+.modal{background:var(--surface); border-radius:14px; padding:22px; width:100%; max-width:420px; max-height:88vh; overflow-y:auto; box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.modal h3{margin:0 0 16px; font-size:17px}
+.field{margin-bottom:14px}
+.field label{display:block; font-size:13px; color:var(--ink-soft); margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%; padding:9px 11px; border:1px solid var(--border); border-radius:8px; background:var(--surface); color:var(--ink); font-size:14px}
+.field textarea{resize:vertical; min-height:60px}
+.modal-actions{display:flex; gap:8px; margin-top:18px; justify-content:flex-end}
+.status-row{display:flex; gap:6px; flex-wrap:wrap}
+.status-opt{flex:1; padding:8px; border:1px solid var(--border); border-radius:8px; text-align:center; cursor:pointer; font-size:13px; background:var(--surface)}
+.status-opt.sel{border-color:var(--primary); background:var(--primary); color:var(--primary-ink)}
+.cal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px}
+.cal-nav{display:flex; align-items:center; gap:10px}
+.cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px}
+.cal-dow{text-align:center; font-size:12px; color:var(--ink-soft); padding-bottom:6px}
+.cal-day{background:var(--surface); border:1px solid var(--border); border-radius:9px; min-height:64px; padding:6px; cursor:pointer; font-size:12px}
+.cal-day.out{opacity:.35}
+.cal-day.today{border-color:var(--primary)}
+.cal-day:hover{border-color:var(--primary)}
+.cal-num{font-weight:600; margin-bottom:4px}
+.cal-dots{display:flex; gap:3px; flex-wrap:wrap}
+.cal-dots span{width:6px;height:6px;border-radius:50%;background:var(--primary)}
+.day-list{margin-top:18px}
+.day-item{background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; gap:10px}
+.hint{font-size:13px; color:var(--ink-soft); text-align:center; padding:30px; max-width:480px; margin:0 auto; line-height:1.9}
+.hint code{background:var(--surface-2); padding:2px 6px; border-radius:5px; font-size:12px}
+::-webkit-scrollbar{height:8px;width:8px}
+::-webkit-scrollbar-thumb{background:var(--border); border-radius:4px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand" id="navTitle"><span class="brand-dot"></span><span>لوحة المشاريع</span></div>
+  <div class="tabs" id="tabs">
+    <button class="tab" data-action="go-projects">المشاريع</button>
+    <button class="tab" data-action="go-calendar">التقويم</button>
+  </div>
+</div>
+<div class="wrap" id="app"></div>
+<div id="modalRoot"></div>
+
+<script>
+/* =======================================================================
+   عدّل هذا القسم فقط: الصق إعدادات مشروع Firebase من لوحة تحكم Firebase
+   (Project settings > عام > تطبيقاتك > أيقونة الويب </>) ثم احفظ الملف.
+   ======================================================================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyDZvOBoXFK8Wz9Z2PkSRHxGWDYlP4Mw-kQ",
+  authDomain: "my-project-ee850.firebaseapp.com",
+  projectId: "my-project-ee850",
+  storageBucket: "my-project-ee850.firebasestorage.app",
+  messagingSenderId: "413169587095",
+  appId: "1:413169587095:web:53e2dafcc726dc83ff6ad2"
+};
+/* ======================================================================= */
+
+let db=null, projects=[], tasks=[], view='projects', currentProjectId=null, calMonth=new Date();
+const app=document.getElementById('app'), modalRoot=document.getElementById('modalRoot'), navTitle=document.getElementById('navTitle'), tabsEl=document.getElementById('tabs');
+const todayStr=()=>new Date().toISOString().slice(0,10);
+const STATUSES=[{k:'todo',l:'لم تبدأ',c:'var(--col-todo)'},{k:'doing',l:'قيد التنفيذ',c:'var(--col-doing)'},{k:'done',l:'تم الإنجاز',c:'var(--col-done)'}];
+const esc=s=>(s||'').toString().replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function setView(v){ view=v; document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  if(v==='projects'){ tabsEl.children[0].classList.add('active'); navTitle.innerHTML='<span class="brand-dot"></span><span>لوحة المشاريع</span>'; renderProjects(); }
+  if(v==='calendar'){ tabsEl.children[1].classList.add('active'); navTitle.innerHTML='<span class="brand-dot"></span><span>التقويم</span>'; renderCalendar(); }
+  if(v==='project'){ navTitle.innerHTML=`<button class="back" data-action="go-projects"><span>→</span>المشاريع</button>`; renderProject(); }
+}
+
+// ---------- render: projects ----------
+function renderProjects(){
+  if(!projects.length && !tasks.length){ app.innerHTML=`<div class="hd-row"><h1>المشاريع</h1><button class="btn btn-primary" data-action="new-project">+ مشروع جديد</button></div>
+    <div class="empty"><h3>ما فيه مشاريع بعد</h3><div>أنشئ أول مشروع جماعي وابدأ توزيع المهام</div></div>`; return; }
+  app.innerHTML=`<div class="hd-row"><h1>المشاريع</h1><button class="btn btn-primary" data-action="new-project">+ مشروع جديد</button></div>
+  <div class="grid">${projects.map(p=>{
+    const pt=tasks.filter(t=>t.projectId===p.id); const done=pt.filter(t=>t.status==='done').length;
+    const pct=pt.length?Math.round(done/pt.length*100):0;
+    return `<div class="p-card" data-action="open-project" data-id="${p.id}">
+      <h3>${esc(p.name)}</h3>
+      <div class="muted">${pt.length} مهمة</div>
+      <div class="progress"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="chips">${(p.members||[]).slice(0,4).map(m=>`<span class="chip">${esc(m)}</span>`).join('')}${(p.members||[]).length>4?`<span class="chip">+${p.members.length-4}</span>`:''}</div>
+    </div>`;}).join('')}</div>`;
+}
+
+// ---------- render: project board ----------
+function renderProject(){
+  const p=projects.find(x=>x.id===currentProjectId);
+  if(!p){ setView('projects'); return; }
+  const pt=tasks.filter(t=>t.projectId===p.id);
+  app.innerHTML=`<div class="hd-row"><div><h2>${esc(p.name)}</h2><div class="muted">${(p.members||[]).join('، ')||'بدون أعضاء'}</div></div>
+    <div style="display:flex;gap:8px"><button class="btn" data-action="edit-members">الأعضاء</button><button class="btn btn-danger" data-action="del-project">حذف المشروع</button></div></div>
+    <div class="board">${STATUSES.map(s=>{
+      const items=pt.filter(t=>t.status===s.k);
+      return `<div class="col"><div class="col-head"><span class="dot" style="background:${s.c}"></span>${s.l}<span class="count">${items.length}</span></div>
+        ${items.map(t=>taskCardHtml(t,s.c)).join('')}
+        <button class="add-task" data-action="new-task" data-status="${s.k}">+ إضافة مهمة</button>
+      </div>`;}).join('')}</div>`;
+}
+function taskCardHtml(t,c){
+  let badge='';
+  if(t.dueDate){ if(t.dueDate<todayStr() && t.status!=='done') badge=`<span class="badge late">متأخرة</span>`;
+    else if(t.dueDate===todayStr()) badge=`<span class="badge due">اليوم</span>`;
+    else badge=`<span class="badge">${fmtDate(t.dueDate)}</span>`; }
+  return `<div class="task" style="--c:${c}" data-action="open-task" data-id="${t.id}">
+    <div class="task-title">${esc(t.title)}</div>
+    <div class="task-foot">${t.assignee?`<span class="avatar" title="${esc(t.assignee)}">${esc(t.assignee).trim().slice(0,1)}</span>`:'<span></span>'}${badge}</div>
+  </div>`;
+}
+function fmtDate(d){ if(!d)return''; const [y,m,day]=d.split('-'); return `${day}/${m}`; }
+
+// ---------- render: calendar ----------
+function renderCalendar(){
+  const y=calMonth.getFullYear(), m=calMonth.getMonth();
+  const first=new Date(y,m,1); const startOffset=first.getDay();
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const monthNames=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const dows=['أحد','اثنين','ثلاثاء','أربعاء','خميس','جمعة','سبت'];
+  let cells=''; const totalCells=Math.ceil((startOffset+daysInMonth)/7)*7;
+  for(let i=0;i<totalCells;i++){
+    const dayNum=i-startOffset+1;
+    if(dayNum<1||dayNum>daysInMonth){ cells+=`<div class="cal-day out"></div>`; continue; }
+    const dateStr=`${y}-${String(m+1).padStart(2,'0')}-${String(dayNum).padStart(2,'0')}`;
+    const dayTasks=tasks.filter(t=>t.dueDate===dateStr);
+    cells+=`<div class="cal-day${dateStr===todayStr()?' today':''}" data-action="cal-day" data-date="${dateStr}">
+      <div class="cal-num">${dayNum}</div><div class="cal-dots">${dayTasks.slice(0,5).map(()=>'<span></span>').join('')}</div></div>`;
+  }
+  app.innerHTML=`<div class="cal-head"><h2>${monthNames[m]} ${y}</h2>
+    <div class="cal-nav"><button class="icon-btn" data-action="cal-prev">▶</button><button class="btn" data-action="cal-today">اليوم</button><button class="icon-btn" data-action="cal-next">◀</button></div></div>
+    <div class="cal-grid">${dows.map(d=>`<div class="cal-dow">${d}</div>`).join('')}${cells}</div>
+    <div class="day-list" id="dayList"></div>`;
+}
+function showDayList(dateStr){
+  const dayTasks=tasks.filter(t=>t.dueDate===dateStr);
+  const el=document.getElementById('dayList'); if(!el)return;
+  if(!dayTasks.length){ el.innerHTML=`<div class="hint">لا توجد مهام بتاريخ ${fmtDate(dateStr)}</div>`; return; }
+  el.innerHTML=dayTasks.map(t=>{ const p=projects.find(x=>x.id===t.projectId);
+    return `<div class="day-item"><div><div style="font-weight:500">${esc(t.title)}</div><div class="muted">${esc(p?p.name:'')}${t.assignee?' · '+esc(t.assignee):''}</div></div>
+    <button class="btn" data-action="open-task-from-cal" data-id="${t.id}" data-pid="${t.projectId}">فتح</button></div>`;}).join('');
+}
+
+// ---------- modals ----------
+function openModal(html){ modalRoot.innerHTML=`<div class="overlay" data-action="close-modal"><div class="modal" data-stop>${html}</div></div>`; }
+function closeModal(){ modalRoot.innerHTML=''; }
+
+function newProjectModal(){
+  openModal(`<h3>مشروع جديد</h3><form data-form="project">
+    <div class="field"><label>اسم المشروع</label><input name="name" required placeholder="مثال: مشروع مادة الإحصاء"></div>
+    <div class="field"><label>الأعضاء (افصل بينهم بفاصلة)</label><input name="members" placeholder="سارة, أحمد, نورة"></div>
+    <div class="modal-actions"><button type="button" class="btn" data-action="close-modal">إلغاء</button><button class="btn btn-primary" type="submit">إنشاء</button></div>
+  </form>`);
+}
+function editMembersModal(p){
+  openModal(`<h3>أعضاء ${esc(p.name)}</h3><form data-form="members">
+    <div class="field"><label>الأعضاء (افصل بينهم بفاصلة)</label><input name="members" value="${esc((p.members||[]).join(', '))}"></div>
+    <div class="modal-actions"><button type="button" class="btn" data-action="close-modal">إلغاء</button><button class="btn btn-primary" type="submit">حفظ</button></div>
+  </form>`);
+}
+function newTaskModal(status){
+  const p=projects.find(x=>x.id===currentProjectId);
+  openModal(`<h3>مهمة جديدة</h3><form data-form="task" data-status="${status}">
+    <div class="field"><label>عنوان المهمة</label><input name="title" required placeholder="مثال: كتابة المقدمة"></div>
+    <div class="field"><label>الوصف (اختياري)</label><textarea name="description"></textarea></div>
+    <div class="field"><label>المسؤول</label><select name="assignee"><option value="">بدون تحديد</option>${(p.members||[]).map(m=>`<option>${esc(m)}</option>`).join('')}</select></div>
+    <div class="field"><label>موعد التسليم</label><input type="date" name="dueDate"></div>
+    <div class="modal-actions"><button type="button" class="btn" data-action="close-modal">إلغاء</button><button class="btn btn-primary" type="submit">إضافة</button></div>
+  </form>`);
+}
+function taskDetailModal(t){
+  const p=projects.find(x=>x.id===t.projectId);
+  openModal(`<h3>${esc(t.title)}</h3>
+    ${t.description?`<div class="muted" style="margin-bottom:14px">${esc(t.description)}</div>`:''}
+    <div class="field"><label>الحالة</label><div class="status-row">${STATUSES.map(s=>`<div class="status-opt${t.status===s.k?' sel':''}" data-action="set-status" data-id="${t.id}" data-status="${s.k}">${s.l}</div>`).join('')}</div></div>
+    <form data-form="edit-task" data-id="${t.id}">
+      <div class="field"><label>المسؤول</label><select name="assignee"><option value="">بدون تحديد</option>${(p.members||[]).map(m=>`<option ${t.assignee===m?'selected':''}>${esc(m)}</option>`).join('')}</select></div>
+      <div class="field"><label>موعد التسليم</label><input type="date" name="dueDate" value="${t.dueDate||''}"></div>
+      <div class="modal-actions"><button type="button" class="btn btn-danger" data-action="del-task" data-id="${t.id}">حذف</button><button class="btn btn-primary" type="submit">حفظ</button></div>
+    </form>`);
+}
+
+// ---------- events ----------
+document.addEventListener('click', e=>{
+  const m=e.target.closest('[data-action]'); if(!m) return;
+  const a=m.dataset.action;
+  if(a==='close-modal' && (e.target===m)) closeModal();
+  if(a==='go-projects'){ currentProjectId=null; setView('projects'); }
+  if(a==='go-calendar') setView('calendar');
+  if(a==='new-project') newProjectModal();
+  if(a==='open-project'){ currentProjectId=m.dataset.id; setView('project'); }
+  if(a==='edit-members'){ editMembersModal(projects.find(x=>x.id===currentProjectId)); }
+  if(a==='del-project'){ if(confirm('حذف المشروع نهائياً؟ (المهام التابعة له ما تنحذف تلقائياً)')){ db.collection('projects').doc(currentProjectId).delete(); currentProjectId=null; setView('projects'); } }
+  if(a==='new-task') newTaskModal(m.dataset.status);
+  if(a==='open-task') taskDetailModal(tasks.find(t=>t.id===m.dataset.id));
+  if(a==='open-task-from-cal'){ currentProjectId=m.dataset.pid; setView('project'); taskDetailModal(tasks.find(t=>t.id===m.dataset.id)); }
+  if(a==='del-task'){ if(confirm('حذف المهمة؟')){ db.collection('tasks').doc(m.dataset.id).delete(); closeModal(); } }
+  if(a==='set-status'){ db.collection('tasks').doc(m.dataset.id).update({status:m.dataset.status}); closeModal(); }
+  if(a==='cal-prev'){ calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()-1,1); renderCalendar(); }
+  if(a==='cal-next'){ calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1); renderCalendar(); }
+  if(a==='cal-today'){ calMonth=new Date(); renderCalendar(); }
+  if(a==='cal-day'){ showDayList(m.dataset.date); }
+  if(m.dataset.stop!==undefined) e.stopPropagation();
+});
+document.addEventListener('submit', e=>{
+  const form=e.target.closest('[data-form]'); if(!form) return; e.preventDefault();
+  const type=form.dataset.form; const fd=new FormData(form);
+  if(type==='project'){
+    const members=(fd.get('members')||'').split(',').map(s=>s.trim()).filter(Boolean);
+    db.collection('projects').add({name:fd.get('name').trim(), members, createdAt:Date.now()});
+    closeModal();
+  }
+  if(type==='members'){
+    const members=(fd.get('members')||'').split(',').map(s=>s.trim()).filter(Boolean);
+    db.collection('projects').doc(currentProjectId).update({members}); closeModal();
+  }
+  if(type==='task'){
+    db.collection('tasks').add({projectId:currentProjectId, title:fd.get('title').trim(), description:fd.get('description')||'', assignee:fd.get('assignee')||'', dueDate:fd.get('dueDate')||'', status:form.dataset.status, createdAt:Date.now()});
+    closeModal();
+  }
+  if(type==='edit-task'){
+    db.collection('tasks').doc(form.dataset.id).update({assignee:fd.get('assignee')||'', dueDate:fd.get('dueDate')||''}); closeModal();
+  }
+});
+
+// ---------- init ----------
+function init(){
+  if(!firebaseConfig.apiKey || firebaseConfig.apiKey==='YOUR_API_KEY'){
+    app.innerHTML='<div class="hint">لازم تضيف إعدادات Firebase أول. افتح ملف <code>index.html</code> وعدّل قسم <code>firebaseConfig</code> في أعلى الكود بالقيم من لوحة تحكم Firebase.</div>';
+    return;
+  }
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  db.collection('projects').onSnapshot(snap=>{
+    projects = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    if(view==='projects') renderProjects(); if(view==='project') renderProject();
+  });
+  db.collection('tasks').onSnapshot(snap=>{
+    tasks = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    if(view==='projects') renderProjects();
+    if(view==='project') renderProject();
+    if(view==='calendar') renderCalendar();
+  });
+  setView('projects');
+}
+init();
+</script>
+</body>
+</html>
