@@ -109,6 +109,13 @@ h2{font-size:22px;margin:0 0 4px}
 .day-item{background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; gap:10px}
 .hint{font-size:13px; color:var(--ink-soft); text-align:center; padding:30px; max-width:480px; margin:0 auto; line-height:1.9}
 .hint code{background:var(--surface-2); padding:2px 6px; border-radius:5px; font-size:12px}
+.member-add{display:flex; gap:8px}
+.member-add input{flex:1; min-width:0}
+.member-add .btn{white-space:nowrap}
+.member-list{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; min-height:8px}
+.member-chip{display:inline-flex; align-items:center; gap:6px; background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:4px 6px 4px 12px; font-size:13px}
+.member-chip button{border:none; background:none; color:var(--ink-soft); cursor:pointer; font-size:15px; line-height:1; padding:0 4px; border-radius:50%}
+.member-chip button:hover{color:var(--danger)}
 ::-webkit-scrollbar{height:8px;width:8px}
 ::-webkit-scrollbar-thumb{background:var(--border); border-radius:4px}
 </style>
@@ -154,7 +161,7 @@ function setView(v){ view=v; document.querySelectorAll('.tab').forEach(t=>t.clas
 // ---------- render: projects ----------
 function renderProjects(){
   if(!projects.length && !tasks.length){ app.innerHTML=`<div class="hd-row"><h1>المشاريع</h1><button class="btn btn-primary" data-action="new-project">+ مشروع جديد</button></div>
-    <div class="empty"><h3>ما فيه مشاريع بعد</h3><div>أنشئ أول مشروع جماعي وابدأ توزيع المهام</div></div>`; return; }
+    <div class="empty"><h3>لا توجد مشاريع بعد</h3><div>أنشئ مشروعك الجماعي الأول، ثم ابدأ بتوزيع المهام على الأعضاء</div></div>`; return; }
   app.innerHTML=`<div class="hd-row"><h1>المشاريع</h1><button class="btn btn-primary" data-action="new-project">+ مشروع جديد</button></div>
   <div class="grid">${projects.map(p=>{
     const pt=tasks.filter(t=>t.projectId===p.id); const done=pt.filter(t=>t.status==='done').length;
@@ -227,18 +234,38 @@ function showDayList(dateStr){
 function openModal(html){ modalRoot.innerHTML=`<div class="overlay" data-action="close-modal"><div class="modal" data-stop>${html}</div></div>`; }
 function closeModal(){ modalRoot.innerHTML=''; }
 
+let draftMembers=[];
+function memberEditorHtml(){
+  return `<div class="field"><label>الأعضاء</label>
+    <div class="member-add"><input type="text" id="memberInput" placeholder="اكتب اسم العضو" autocomplete="off"><button type="button" class="btn" data-action="add-member">إضافة عضو</button></div>
+    <div class="member-list" id="memberList"></div></div>`;
+}
+function renderMemberList(){
+  const el=document.getElementById('memberList'); if(!el) return;
+  el.innerHTML=draftMembers.map((m,i)=>`<span class="member-chip">${esc(m)}<button type="button" title="إزالة" data-action="remove-member" data-index="${i}">×</button></span>`).join('');
+}
+function addDraftMember(){
+  const input=document.getElementById('memberInput'); if(!input) return;
+  const name=input.value.trim();
+  if(name && !draftMembers.includes(name)) draftMembers.push(name);
+  input.value=''; renderMemberList(); input.focus();
+}
 function newProjectModal(){
+  draftMembers=[];
   openModal(`<h3>مشروع جديد</h3><form data-form="project">
     <div class="field"><label>اسم المشروع</label><input name="name" required placeholder="مثال: مشروع مادة الإحصاء"></div>
-    <div class="field"><label>الأعضاء (افصل بينهم بفاصلة)</label><input name="members" placeholder="سارة, أحمد, نورة"></div>
+    ${memberEditorHtml()}
     <div class="modal-actions"><button type="button" class="btn" data-action="close-modal">إلغاء</button><button class="btn btn-primary" type="submit">إنشاء</button></div>
   </form>`);
+  renderMemberList();
 }
 function editMembersModal(p){
+  draftMembers=[...(p.members||[])];
   openModal(`<h3>أعضاء ${esc(p.name)}</h3><form data-form="members">
-    <div class="field"><label>الأعضاء (افصل بينهم بفاصلة)</label><input name="members" value="${esc((p.members||[]).join(', '))}"></div>
+    ${memberEditorHtml()}
     <div class="modal-actions"><button type="button" class="btn" data-action="close-modal">إلغاء</button><button class="btn btn-primary" type="submit">حفظ</button></div>
   </form>`);
+  renderMemberList();
 }
 function newTaskModal(status){
   const p=projects.find(x=>x.id===currentProjectId);
@@ -272,11 +299,13 @@ document.addEventListener('click', e=>{
   if(a==='new-project') newProjectModal();
   if(a==='open-project'){ currentProjectId=m.dataset.id; setView('project'); }
   if(a==='edit-members'){ editMembersModal(projects.find(x=>x.id===currentProjectId)); }
-  if(a==='del-project'){ if(confirm('حذف المشروع نهائياً؟ (المهام التابعة له ما تنحذف تلقائياً)')){ db.collection('projects').doc(currentProjectId).delete(); currentProjectId=null; setView('projects'); } }
+  if(a==='add-member') addDraftMember();
+  if(a==='remove-member'){ draftMembers.splice(+m.dataset.index,1); renderMemberList(); }
+  if(a==='del-project'){ if(confirm('هل تريد حذف المشروع نهائياً؟ (لن تُحذف المهام التابعة له تلقائياً)')){ db.collection('projects').doc(currentProjectId).delete(); currentProjectId=null; setView('projects'); } }
   if(a==='new-task') newTaskModal(m.dataset.status);
   if(a==='open-task') taskDetailModal(tasks.find(t=>t.id===m.dataset.id));
   if(a==='open-task-from-cal'){ currentProjectId=m.dataset.pid; setView('project'); taskDetailModal(tasks.find(t=>t.id===m.dataset.id)); }
-  if(a==='del-task'){ if(confirm('حذف المهمة؟')){ db.collection('tasks').doc(m.dataset.id).delete(); closeModal(); } }
+  if(a==='del-task'){ if(confirm('هل تريد حذف هذه المهمة؟')){ db.collection('tasks').doc(m.dataset.id).delete(); closeModal(); } }
   if(a==='set-status'){ db.collection('tasks').doc(m.dataset.id).update({status:m.dataset.status}); closeModal(); }
   if(a==='cal-prev'){ calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()-1,1); renderCalendar(); }
   if(a==='cal-next'){ calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1); renderCalendar(); }
@@ -284,17 +313,20 @@ document.addEventListener('click', e=>{
   if(a==='cal-day'){ showDayList(m.dataset.date); }
   if(m.dataset.stop!==undefined) e.stopPropagation();
 });
+document.addEventListener('keydown', e=>{
+  if(e.key==='Enter' && e.target && e.target.id==='memberInput'){ e.preventDefault(); addDraftMember(); }
+});
 document.addEventListener('submit', e=>{
   const form=e.target.closest('[data-form]'); if(!form) return; e.preventDefault();
   const type=form.dataset.form; const fd=new FormData(form);
   if(type==='project'){
-    const members=(fd.get('members')||'').split(',').map(s=>s.trim()).filter(Boolean);
-    db.collection('projects').add({name:fd.get('name').trim(), members, createdAt:Date.now()});
+    addDraftMember();
+    db.collection('projects').add({name:fd.get('name').trim(), members:[...draftMembers], createdAt:Date.now()});
     closeModal();
   }
   if(type==='members'){
-    const members=(fd.get('members')||'').split(',').map(s=>s.trim()).filter(Boolean);
-    db.collection('projects').doc(currentProjectId).update({members}); closeModal();
+    addDraftMember();
+    db.collection('projects').doc(currentProjectId).update({members:[...draftMembers]}); closeModal();
   }
   if(type==='task'){
     db.collection('tasks').add({projectId:currentProjectId, title:fd.get('title').trim(), description:fd.get('description')||'', assignee:fd.get('assignee')||'', dueDate:fd.get('dueDate')||'', status:form.dataset.status, createdAt:Date.now()});
@@ -308,7 +340,7 @@ document.addEventListener('submit', e=>{
 // ---------- init ----------
 function init(){
   if(!firebaseConfig.apiKey || firebaseConfig.apiKey==='YOUR_API_KEY'){
-    app.innerHTML='<div class="hint">لازم تضيف إعدادات Firebase أول. افتح ملف <code>index.html</code> وعدّل قسم <code>firebaseConfig</code> في أعلى الكود بالقيم من لوحة تحكم Firebase.</div>';
+    app.innerHTML='<div class="hint">يجب إضافة إعدادات Firebase أولاً. افتح الملف <code>index.html</code> وعدّل قسم <code>firebaseConfig</code> في أعلى الشيفرة بالقيم المأخوذة من لوحة تحكم Firebase.</div>';
     return;
   }
   firebase.initializeApp(firebaseConfig);
