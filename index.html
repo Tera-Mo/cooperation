@@ -36,13 +36,17 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 button,input,select,textarea{font-family:inherit}
 .topbar{
   position:sticky; top:0; top:env(safe-area-inset-top,0px); z-index:5; background:var(--surface);
-  border-bottom:1px solid var(--border); padding:14px 18px; display:flex; align-items:center; gap:14px;
+  border-bottom:1px solid var(--border); padding:12px 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
 }
 .brand{font-weight:700; font-size:17px; display:flex; align-items:center; gap:8px}
 .brand-dot{width:9px;height:9px;border-radius:50%;background:var(--primary)}
 .tabs{display:flex; gap:4px; margin-inline-start:auto}
 .tab{padding:7px 14px; border-radius:8px; border:none; background:transparent; color:var(--ink-soft); cursor:pointer; font-size:14px; font-weight:500}
 .tab.active{background:var(--surface-2); color:var(--ink)}
+.auth-box{display:flex; align-items:center; gap:8px}
+.role-badge{font-size:12px; padding:3px 10px; border-radius:20px; background:var(--surface-2); color:var(--ink-soft); border:1px solid var(--border)}
+.role-badge.owner{color:var(--accent); border-color:var(--accent)}
+.role-badge.admin{color:var(--primary); border-color:var(--primary)}
 .back{border:none;background:none;color:var(--ink-soft);cursor:pointer;font-size:14px;display:flex;align-items:center;gap:4px;padding:6px}
 .wrap{max-width:960px; margin:0 auto; padding:24px 18px 60px; overflow-x:hidden}
 .hd-row{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; gap:10px; flex-wrap:wrap}
@@ -51,6 +55,7 @@ h2{font-size:22px;margin:0 0 4px}
 .muted{color:var(--ink-soft); font-size:14px}
 .btn{border:1px solid var(--border); background:var(--surface); color:var(--ink); padding:9px 16px; border-radius:9px; cursor:pointer; font-size:14px; font-weight:500; transition:border-color .15s}
 .btn:hover{border-color:var(--primary)}
+.btn-sm{padding:6px 12px; font-size:13px}
 .btn-primary{background:var(--primary); color:var(--primary-ink); border-color:var(--primary)}
 .btn-primary:hover{opacity:.92}
 .btn-danger{color:var(--danger); border-color:var(--danger)}
@@ -61,19 +66,24 @@ h2{font-size:22px;margin:0 0 4px}
 .p-card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; cursor:pointer; box-shadow:var(--shadow); transition:border-color .15s}
 .p-card:hover{border-color:var(--primary)}
 .p-card h3{margin:0 0 6px; font-size:16px}
-.p-meta{display:flex; justify-content:space-between; align-items:center; margin-top:12px}
 .chips{display:flex; flex-wrap:wrap; gap:5px; margin-top:10px}
 .chip{background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3px 10px; font-size:12px; color:var(--ink-soft)}
 .progress{height:6px; border-radius:4px; background:var(--surface-2); overflow:hidden; margin-top:8px}
 .progress-fill{height:100%; background:var(--primary); border-radius:4px}
 .empty{text-align:center; padding:60px 20px; color:var(--ink-soft)}
 .empty h3{color:var(--ink); margin-bottom:6px}
+.toolbar{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap}
+.toolbar input,.toolbar select{padding:8px 11px; border:1px solid var(--border); border-radius:8px; background:var(--surface); color:var(--ink); font-size:14px}
+.toolbar input{flex:1; min-width:160px}
 .board{display:flex; gap:14px; overflow-x:auto; padding-bottom:8px}
-.col{background:var(--surface-2); border-radius:12px; padding:12px; min-width:250px; flex:1}
+.col{background:var(--surface-2); border-radius:12px; padding:12px; min-width:250px; flex:1; border:2px solid transparent; transition:border-color .12s, background .12s}
+.col.drop-over{border-color:var(--primary); background:color-mix(in srgb, var(--primary) 8%, var(--surface-2))}
 .col-head{display:flex; align-items:center; gap:8px; padding:4px 6px 10px; font-weight:600; font-size:14px}
 .dot{width:8px;height:8px;border-radius:50%}
 .count{color:var(--ink-soft); font-weight:400; font-size:13px; margin-inline-start:auto}
 .task{background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:11px 12px; margin-bottom:9px; cursor:pointer; box-shadow:var(--shadow); border-inline-start:3px solid var(--c)}
+.task[draggable="true"]{cursor:grab}
+.task.dragging{opacity:.45}
 .task:hover{border-color:var(--primary)}
 .task-title{font-size:14px; font-weight:500; margin-bottom:7px}
 .task-foot{display:flex; align-items:center; justify-content:space-between; gap:6px}
@@ -90,10 +100,13 @@ h2{font-size:22px;margin:0 0 4px}
 .field label{display:block; font-size:13px; color:var(--ink-soft); margin-bottom:5px}
 .field input,.field select,.field textarea{width:100%; padding:9px 11px; border:1px solid var(--border); border-radius:8px; background:var(--surface); color:var(--ink); font-size:14px}
 .field textarea{resize:vertical; min-height:60px}
+.form-error{color:var(--danger); font-size:13px; min-height:18px; margin-top:-4px}
 .modal-actions{display:flex; gap:8px; margin-top:18px; justify-content:flex-end}
 .status-row{display:flex; gap:6px; flex-wrap:wrap}
 .status-opt{flex:1; padding:8px; border:1px solid var(--border); border-radius:8px; text-align:center; cursor:pointer; font-size:13px; background:var(--surface)}
 .status-opt.sel{border-color:var(--primary); background:var(--primary); color:var(--primary-ink)}
+.detail-row{display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); font-size:14px}
+.detail-row span:first-child{color:var(--ink-soft)}
 .cal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px}
 .cal-nav{display:flex; align-items:center; gap:10px}
 .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px}
@@ -113,9 +126,15 @@ h2{font-size:22px;margin:0 0 4px}
 .member-add input{flex:1; min-width:0}
 .member-add .btn{white-space:nowrap}
 .member-list{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; min-height:8px}
-.member-chip{display:inline-flex; align-items:center; gap:6px; background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:4px 6px 4px 12px; font-size:13px}
+.member-chip{display:inline-flex; align-items:center; gap:6px; background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:4px 12px 4px 6px; font-size:13px}
 .member-chip button{border:none; background:none; color:var(--ink-soft); cursor:pointer; font-size:15px; line-height:1; padding:0 4px; border-radius:50%}
 .member-chip button:hover{color:var(--danger)}
+.panel{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:18px}
+.panel h3{margin:0 0 12px; font-size:15px}
+.admin-form{display:flex; gap:8px; flex-wrap:wrap}
+.admin-form input{flex:1; min-width:140px; padding:9px 11px; border:1px solid var(--border); border-radius:8px; background:var(--surface); color:var(--ink); font-size:14px}
+.admin-item{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 0; border-bottom:1px solid var(--border)}
+.admin-item:last-child{border-bottom:none}
 ::-webkit-scrollbar{height:8px;width:8px}
 ::-webkit-scrollbar-thumb{background:var(--border); border-radius:4px}
 </style>
@@ -123,18 +142,15 @@ h2{font-size:22px;margin:0 0 4px}
 <body>
 <div class="topbar">
   <div class="brand" id="navTitle"><span class="brand-dot"></span><span>لوحة المشاريع</span></div>
-  <div class="tabs" id="tabs">
-    <button class="tab" data-action="go-projects">المشاريع</button>
-    <button class="tab" data-action="go-calendar">التقويم</button>
-  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="auth-box" id="authBox"></div>
 </div>
 <div class="wrap" id="app"></div>
 <div id="modalRoot"></div>
 
 <script>
 /* =======================================================================
-   عدّل هذا القسم فقط: الصق إعدادات مشروع Firebase من لوحة تحكم Firebase
-   (Project settings > عام > تطبيقاتك > أيقونة الويب </>) ثم احفظ الملف.
+   إعدادات Firebase
    ======================================================================= */
 const firebaseConfig = {
   apiKey: "AIzaSyDZvOBoXFK8Wz9Z2PkSRHxGWDYlP4Mw-kQ",
@@ -146,29 +162,67 @@ const firebaseConfig = {
 };
 /* ======================================================================= */
 
+/* حساب المالك (مشروع مدرسي: الحماية هنا بسيطة وليست حماية كاملة) */
+const OWNER = { username: 'admin', password: 'admin123' };
+
 let db=null, projects=[], tasks=[], view='projects', currentProjectId=null, calMonth=new Date();
-const app=document.getElementById('app'), modalRoot=document.getElementById('modalRoot'), navTitle=document.getElementById('navTitle'), tabsEl=document.getElementById('tabs');
-const todayStr=()=>new Date().toISOString().slice(0,10);
+let session=null;               // {role:'owner'|'admin', name}
+let filterText='', filterMember='';
+let dragId=null;
+const app=document.getElementById('app'), modalRoot=document.getElementById('modalRoot'),
+      navTitle=document.getElementById('navTitle'), tabsEl=document.getElementById('tabs'), authBox=document.getElementById('authBox');
+
+const pad=n=>String(n).padStart(2,'0');
+const todayStr=()=>{ const d=new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
 const STATUSES=[{k:'todo',l:'لم تبدأ',c:'var(--col-todo)'},{k:'doing',l:'قيد التنفيذ',c:'var(--col-doing)'},{k:'done',l:'تم الإنجاز',c:'var(--col-done)'}];
 const esc=s=>(s||'').toString().replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-function setView(v){ view=v; document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  if(v==='projects'){ tabsEl.children[0].classList.add('active'); navTitle.innerHTML='<span class="brand-dot"></span><span>لوحة المشاريع</span>'; renderProjects(); }
-  if(v==='calendar'){ tabsEl.children[1].classList.add('active'); navTitle.innerHTML='<span class="brand-dot"></span><span>التقويم</span>'; renderCalendar(); }
-  if(v==='project'){ navTitle.innerHTML=`<button class="back" data-action="go-projects"><span>→</span>المشاريع</button>`; renderProject(); }
+const canEdit=()=>!!session;
+const isOwner=()=>!!session && session.role==='owner';
+
+// ---------- الجلسة ----------
+function loadSession(){ try{ const s=JSON.parse(localStorage.getItem('session')||'null'); if(s && (s.role==='owner'||s.role==='admin')) session=s; }catch(e){} }
+function saveSession(){ try{ if(session) localStorage.setItem('session',JSON.stringify(session)); else localStorage.removeItem('session'); }catch(e){} }
+
+function renderTopbar(){
+  tabsEl.innerHTML=`<button class="tab" data-view="projects" data-action="go-projects">المشاريع</button>
+    <button class="tab" data-view="calendar" data-action="go-calendar">التقويم</button>
+    ${isOwner()?'<button class="tab" data-view="admins" data-action="go-admins">المسؤولون</button>':''}`;
+  authBox.innerHTML = session
+    ? `<span class="role-badge ${session.role}">${session.role==='owner'?'المالك':'مسؤول · '+esc(session.name)}</span><button class="btn btn-sm" data-action="logout">تسجيل الخروج</button>`
+    : `<button class="btn btn-sm btn-primary" data-action="login">تسجيل الدخول كمسؤول أو مالك</button>`;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.view===view));
+}
+
+function setView(v){
+  if(v==='admins' && !isOwner()) v='projects';
+  view=v;
+  if(v==='projects') navTitle.innerHTML='<span class="brand-dot"></span><span>لوحة المشاريع</span>';
+  if(v==='calendar') navTitle.innerHTML='<span class="brand-dot"></span><span>التقويم</span>';
+  if(v==='admins')   navTitle.innerHTML='<span class="brand-dot"></span><span>المسؤولون</span>';
+  if(v==='project')  navTitle.innerHTML=`<button class="back" data-action="go-projects"><span>→</span>المشاريع</button>`;
+  renderTopbar();
+  renderCurrent();
+}
+function renderCurrent(){
+  if(view==='projects') renderProjects();
+  else if(view==='project') renderProject();
+  else if(view==='calendar') renderCalendar();
+  else if(view==='admins') renderAdmins();
 }
 
 // ---------- render: projects ----------
 function renderProjects(){
-  if(!projects.length && !tasks.length){ app.innerHTML=`<div class="hd-row"><h1>المشاريع</h1><button class="btn btn-primary" data-action="new-project">+ مشروع جديد</button></div>
-    <div class="empty"><h3>لا توجد مشاريع بعد</h3><div>أنشئ مشروعك الجماعي الأول، ثم ابدأ بتوزيع المهام على الأعضاء</div></div>`; return; }
-  app.innerHTML=`<div class="hd-row"><h1>المشاريع</h1><button class="btn btn-primary" data-action="new-project">+ مشروع جديد</button></div>
+  const addBtn = canEdit()?`<button class="btn btn-primary" data-action="new-project">+ مشروع جديد</button>`:'';
+  if(!projects.length){ app.innerHTML=`<div class="hd-row"><h1>المشاريع</h1>${addBtn}</div>
+    <div class="empty"><h3>لا توجد مشاريع بعد</h3><div>${canEdit()?'أنشئ مشروعك الجماعي الأول، ثم ابدأ بتوزيع المهام على الأعضاء':'سيظهر هنا كل مشروع يضيفه المسؤولون'}</div></div>`; return; }
+  app.innerHTML=`<div class="hd-row"><h1>المشاريع</h1>${addBtn}</div>
   <div class="grid">${projects.map(p=>{
     const pt=tasks.filter(t=>t.projectId===p.id); const done=pt.filter(t=>t.status==='done').length;
     const pct=pt.length?Math.round(done/pt.length*100):0;
     return `<div class="p-card" data-action="open-project" data-id="${p.id}">
       <h3>${esc(p.name)}</h3>
-      <div class="muted">${pt.length} مهمة</div>
+      <div class="muted">${pt.length} مهمة · ${pct}% منجز</div>
       <div class="progress"><div class="progress-fill" style="width:${pct}%"></div></div>
       <div class="chips">${(p.members||[]).slice(0,4).map(m=>`<span class="chip">${esc(m)}</span>`).join('')}${(p.members||[]).length>4?`<span class="chip">+${p.members.length-4}</span>`:''}</div>
     </div>`;}).join('')}</div>`;
@@ -177,23 +231,37 @@ function renderProjects(){
 // ---------- render: project board ----------
 function renderProject(){
   const p=projects.find(x=>x.id===currentProjectId);
-  if(!p){ setView('projects'); return; }
-  const pt=tasks.filter(t=>t.projectId===p.id);
-  app.innerHTML=`<div class="hd-row"><div><h2>${esc(p.name)}</h2><div class="muted">${(p.members||[]).join('، ')||'بدون أعضاء'}</div></div>
-    <div style="display:flex;gap:8px"><button class="btn" data-action="edit-members">الأعضاء</button><button class="btn btn-danger" data-action="del-project">حذف المشروع</button></div></div>
-    <div class="board">${STATUSES.map(s=>{
-      const items=pt.filter(t=>t.status===s.k);
-      return `<div class="col"><div class="col-head"><span class="dot" style="background:${s.c}"></span>${s.l}<span class="count">${items.length}</span></div>
-        ${items.map(t=>taskCardHtml(t,s.c)).join('')}
-        <button class="add-task" data-action="new-task" data-status="${s.k}">+ إضافة مهمة</button>
-      </div>`;}).join('')}</div>`;
+  if(!p){ currentProjectId=null; if(view==='project') setView('projects'); return; }
+  const members=p.members||[];
+  if(filterMember && !members.includes(filterMember)) filterMember='';
+  app.innerHTML=`<div class="hd-row"><div><h2>${esc(p.name)}</h2><div class="muted">${members.map(esc).join('، ')||'بدون أعضاء'}</div></div>
+    ${canEdit()?`<div style="display:flex;gap:8px"><button class="btn" data-action="edit-members">الأعضاء</button><button class="btn btn-danger" data-action="del-project">حذف المشروع</button></div>`:''}</div>
+    <div class="toolbar">
+      <input type="search" id="taskSearch" placeholder="ابحث في المهام…" value="${esc(filterText)}" autocomplete="off">
+      <select id="memberFilter"><option value="">كل الأعضاء</option>${members.map(m=>`<option value="${esc(m)}" ${m===filterMember?'selected':''}>مهام ${esc(m)}</option>`).join('')}</select>
+    </div>
+    <div class="board" id="board"></div>`;
+  renderBoard();
+}
+function renderBoard(){
+  const board=document.getElementById('board'); if(!board) return;
+  const q=filterText.trim().toLowerCase();
+  const pt=tasks.filter(t=>t.projectId===currentProjectId)
+    .filter(t=>!filterMember || t.assignee===filterMember)
+    .filter(t=>!q || (t.title||'').toLowerCase().includes(q) || (t.description||'').toLowerCase().includes(q));
+  board.innerHTML=STATUSES.map(s=>{
+    const items=pt.filter(t=>t.status===s.k);
+    return `<div class="col" data-status="${s.k}"><div class="col-head"><span class="dot" style="background:${s.c}"></span>${s.l}<span class="count">${items.length}</span></div>
+      ${items.map(t=>taskCardHtml(t,s.c)).join('')}
+      ${canEdit()?`<button class="add-task" data-action="new-task" data-status="${s.k}">+ إضافة مهمة</button>`:''}
+    </div>`;}).join('');
 }
 function taskCardHtml(t,c){
   let badge='';
   if(t.dueDate){ if(t.dueDate<todayStr() && t.status!=='done') badge=`<span class="badge late">متأخرة</span>`;
     else if(t.dueDate===todayStr()) badge=`<span class="badge due">اليوم</span>`;
     else badge=`<span class="badge">${fmtDate(t.dueDate)}</span>`; }
-  return `<div class="task" style="--c:${c}" data-action="open-task" data-id="${t.id}">
+  return `<div class="task" style="--c:${c}" ${canEdit()?'draggable="true"':''} data-action="open-task" data-id="${t.id}">
     <div class="task-title">${esc(t.title)}</div>
     <div class="task-foot">${t.assignee?`<span class="avatar" title="${esc(t.assignee)}">${esc(t.assignee).trim().slice(0,1)}</span>`:'<span></span>'}${badge}</div>
   </div>`;
@@ -211,7 +279,7 @@ function renderCalendar(){
   for(let i=0;i<totalCells;i++){
     const dayNum=i-startOffset+1;
     if(dayNum<1||dayNum>daysInMonth){ cells+=`<div class="cal-day out"></div>`; continue; }
-    const dateStr=`${y}-${String(m+1).padStart(2,'0')}-${String(dayNum).padStart(2,'0')}`;
+    const dateStr=`${y}-${pad(m+1)}-${pad(dayNum)}`;
     const dayTasks=tasks.filter(t=>t.dueDate===dateStr);
     cells+=`<div class="cal-day${dateStr===todayStr()?' today':''}" data-action="cal-day" data-date="${dateStr}">
       <div class="cal-num">${dayNum}</div><div class="cal-dots">${dayTasks.slice(0,5).map(()=>'<span></span>').join('')}</div></div>`;
@@ -230,9 +298,41 @@ function showDayList(dateStr){
     <button class="btn" data-action="open-task-from-cal" data-id="${t.id}" data-pid="${t.projectId}">فتح</button></div>`;}).join('');
 }
 
+// ---------- render: admins (للمالك فقط) ----------
+function renderAdmins(){
+  app.innerHTML=`<div class="hd-row"><h1>المسؤولون</h1></div>
+    <div class="panel"><h3>إنشاء حساب مسؤول جديد</h3>
+      <form data-form="admin" class="admin-form">
+        <input name="username" required placeholder="اسم المستخدم" autocomplete="off">
+        <input name="password" required placeholder="كلمة المرور" autocomplete="off">
+        <button class="btn btn-primary" type="submit">إضافة مسؤول</button>
+      </form>
+      <div class="form-error" id="adminError" style="margin-top:8px"></div>
+    </div>
+    <div class="panel"><h3>الحسابات الحالية</h3><div id="adminList" class="muted">جارٍ التحميل…</div></div>`;
+  loadAdminList();
+}
+function loadAdminList(){
+  db.collection('admins').get().then(snap=>{
+    const el=document.getElementById('adminList'); if(!el) return;
+    if(snap.empty){ el.innerHTML='لا توجد حسابات مسؤولين بعد.'; return; }
+    el.innerHTML=snap.docs.map(d=>`<div class="admin-item"><div><b>${esc(d.data().username||d.id)}</b></div>
+      <button class="btn btn-sm btn-danger" data-action="del-admin" data-id="${esc(d.id)}">حذف</button></div>`).join('');
+  }).catch(()=>{ const el=document.getElementById('adminList'); if(el) el.textContent='تعذّر تحميل الحسابات.'; });
+}
+
 // ---------- modals ----------
 function openModal(html){ modalRoot.innerHTML=`<div class="overlay" data-action="close-modal"><div class="modal" data-stop>${html}</div></div>`; }
 function closeModal(){ modalRoot.innerHTML=''; }
+
+function loginModal(){
+  openModal(`<h3>تسجيل الدخول</h3><form data-form="login">
+    <div class="field"><label>اسم المستخدم</label><input name="username" required autocomplete="username" autofocus></div>
+    <div class="field"><label>كلمة المرور</label><input name="password" type="password" required autocomplete="current-password"></div>
+    <div class="form-error" id="loginError"></div>
+    <div class="modal-actions"><button type="button" class="btn" data-action="close-modal">إلغاء</button><button class="btn btn-primary" type="submit">دخول</button></div>
+  </form>`);
+}
 
 let draftMembers=[];
 function memberEditorHtml(){
@@ -242,7 +342,7 @@ function memberEditorHtml(){
 }
 function renderMemberList(){
   const el=document.getElementById('memberList'); if(!el) return;
-  el.innerHTML=draftMembers.map((m,i)=>`<span class="member-chip">${esc(m)}<button type="button" title="إزالة" data-action="remove-member" data-index="${i}">×</button></span>`).join('');
+  el.innerHTML=draftMembers.map((m,i)=>`<span class="member-chip"><button type="button" title="إزالة" data-action="remove-member" data-index="${i}">×</button>${esc(m)}</span>`).join('');
 }
 function addDraftMember(){
   const input=document.getElementById('memberInput'); if(!input) return;
@@ -272,53 +372,122 @@ function newTaskModal(status){
   openModal(`<h3>مهمة جديدة</h3><form data-form="task" data-status="${status}">
     <div class="field"><label>عنوان المهمة</label><input name="title" required placeholder="مثال: كتابة المقدمة"></div>
     <div class="field"><label>الوصف (اختياري)</label><textarea name="description"></textarea></div>
-    <div class="field"><label>المسؤول</label><select name="assignee"><option value="">بدون تحديد</option>${(p.members||[]).map(m=>`<option>${esc(m)}</option>`).join('')}</select></div>
+    <div class="field"><label>المسؤول عن المهمة</label><select name="assignee"><option value="">بدون تحديد</option>${(p.members||[]).map(m=>`<option>${esc(m)}</option>`).join('')}</select></div>
     <div class="field"><label>موعد التسليم</label><input type="date" name="dueDate"></div>
     <div class="modal-actions"><button type="button" class="btn" data-action="close-modal">إلغاء</button><button class="btn btn-primary" type="submit">إضافة</button></div>
   </form>`);
 }
 function taskDetailModal(t){
-  const p=projects.find(x=>x.id===t.projectId);
-  openModal(`<h3>${esc(t.title)}</h3>
-    ${t.description?`<div class="muted" style="margin-bottom:14px">${esc(t.description)}</div>`:''}
-    <div class="field"><label>الحالة</label><div class="status-row">${STATUSES.map(s=>`<div class="status-opt${t.status===s.k?' sel':''}" data-action="set-status" data-id="${t.id}" data-status="${s.k}">${s.l}</div>`).join('')}</div></div>
+  if(!t) return;
+  const p=projects.find(x=>x.id===t.projectId); const members=(p&&p.members)||[];
+  const st=STATUSES.find(s=>s.k===t.status);
+  if(!canEdit()){
+    openModal(`<h3>${esc(t.title)}</h3>
+      ${t.description?`<div class="muted" style="margin-bottom:12px">${esc(t.description)}</div>`:''}
+      <div class="detail-row"><span>الحالة</span><span>${st?st.l:''}</span></div>
+      <div class="detail-row"><span>المسؤول عن المهمة</span><span>${esc(t.assignee)||'غير محدد'}</span></div>
+      <div class="detail-row"><span>موعد التسليم</span><span>${t.dueDate?fmtDate(t.dueDate):'غير محدد'}</span></div>
+      <div class="modal-actions"><button type="button" class="btn" data-action="close-modal">إغلاق</button></div>`);
+    return;
+  }
+  const assigneeOpts=[...members]; if(t.assignee && !assigneeOpts.includes(t.assignee)) assigneeOpts.push(t.assignee);
+  openModal(`<h3>تعديل المهمة</h3>
     <form data-form="edit-task" data-id="${t.id}">
-      <div class="field"><label>المسؤول</label><select name="assignee"><option value="">بدون تحديد</option>${(p.members||[]).map(m=>`<option ${t.assignee===m?'selected':''}>${esc(m)}</option>`).join('')}</select></div>
+      <div class="field"><label>عنوان المهمة</label><input name="title" required value="${esc(t.title)}"></div>
+      <div class="field"><label>الوصف</label><textarea name="description">${esc(t.description)}</textarea></div>
+      <div class="field"><label>الحالة</label>
+        <input type="hidden" name="status" value="${t.status}">
+        <div class="status-row">${STATUSES.map(s=>`<div class="status-opt${t.status===s.k?' sel':''}" data-action="pick-status" data-status="${s.k}">${s.l}</div>`).join('')}</div></div>
+      <div class="field"><label>المسؤول عن المهمة</label><select name="assignee"><option value="">بدون تحديد</option>${assigneeOpts.map(m=>`<option ${t.assignee===m?'selected':''}>${esc(m)}</option>`).join('')}</select></div>
       <div class="field"><label>موعد التسليم</label><input type="date" name="dueDate" value="${t.dueDate||''}"></div>
       <div class="modal-actions"><button type="button" class="btn btn-danger" data-action="del-task" data-id="${t.id}">حذف</button><button class="btn btn-primary" type="submit">حفظ</button></div>
     </form>`);
 }
 
-// ---------- events ----------
+// ---------- الأحداث ----------
 document.addEventListener('click', e=>{
   const m=e.target.closest('[data-action]'); if(!m) return;
   const a=m.dataset.action;
   if(a==='close-modal' && (e.target===m)) closeModal();
   if(a==='go-projects'){ currentProjectId=null; setView('projects'); }
   if(a==='go-calendar') setView('calendar');
-  if(a==='new-project') newProjectModal();
-  if(a==='open-project'){ currentProjectId=m.dataset.id; setView('project'); }
-  if(a==='edit-members'){ editMembersModal(projects.find(x=>x.id===currentProjectId)); }
-  if(a==='add-member') addDraftMember();
-  if(a==='remove-member'){ draftMembers.splice(+m.dataset.index,1); renderMemberList(); }
-  if(a==='del-project'){ if(confirm('هل تريد حذف المشروع نهائياً؟ (لن تُحذف المهام التابعة له تلقائياً)')){ db.collection('projects').doc(currentProjectId).delete(); currentProjectId=null; setView('projects'); } }
-  if(a==='new-task') newTaskModal(m.dataset.status);
-  if(a==='open-task') taskDetailModal(tasks.find(t=>t.id===m.dataset.id));
-  if(a==='open-task-from-cal'){ currentProjectId=m.dataset.pid; setView('project'); taskDetailModal(tasks.find(t=>t.id===m.dataset.id)); }
-  if(a==='del-task'){ if(confirm('هل تريد حذف هذه المهمة؟')){ db.collection('tasks').doc(m.dataset.id).delete(); closeModal(); } }
-  if(a==='set-status'){ db.collection('tasks').doc(m.dataset.id).update({status:m.dataset.status}); closeModal(); }
+  if(a==='go-admins') setView('admins');
+  if(a==='login') loginModal();
+  if(a==='logout'){ session=null; saveSession(); closeModal(); setView(view==='admins'?'projects':view); }
+  if(a==='open-project'){ currentProjectId=m.dataset.id; filterText=''; filterMember=''; setView('project'); }
   if(a==='cal-prev'){ calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()-1,1); renderCalendar(); }
   if(a==='cal-next'){ calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1); renderCalendar(); }
   if(a==='cal-today'){ calMonth=new Date(); renderCalendar(); }
   if(a==='cal-day'){ showDayList(m.dataset.date); }
+  if(a==='open-task') taskDetailModal(tasks.find(t=>t.id===m.dataset.id));
+  if(a==='open-task-from-cal'){ currentProjectId=m.dataset.pid; filterText=''; filterMember=''; setView('project'); taskDetailModal(tasks.find(t=>t.id===m.dataset.id)); }
+
+  // ----- ما يلي يتطلب صلاحية تعديل -----
+  const writeActions=['new-project','edit-members','add-member','remove-member','del-project','new-task','del-task','pick-status','del-admin'];
+  if(writeActions.includes(a)){
+    if(!canEdit()){ loginModal(); return; }
+    if(a==='new-project') newProjectModal();
+    if(a==='edit-members') editMembersModal(projects.find(x=>x.id===currentProjectId));
+    if(a==='add-member') addDraftMember();
+    if(a==='remove-member'){ draftMembers.splice(+m.dataset.index,1); renderMemberList(); }
+    if(a==='new-task') newTaskModal(m.dataset.status);
+    if(a==='pick-status'){
+      const f=m.closest('form'); f.elements.status.value=m.dataset.status;
+      f.querySelectorAll('.status-opt').forEach(o=>o.classList.toggle('sel',o===m));
+    }
+    if(a==='del-task'){ if(confirm('هل تريد حذف هذه المهمة؟')){ db.collection('tasks').doc(m.dataset.id).delete(); closeModal(); } }
+    if(a==='del-project'){ deleteProject(currentProjectId); }
+    if(a==='del-admin' && isOwner()){ if(confirm('هل تريد حذف حساب هذا المسؤول؟')){ db.collection('admins').doc(m.dataset.id).delete().then(loadAdminList); } }
+  }
   if(m.dataset.stop!==undefined) e.stopPropagation();
 });
+
+async function deleteProject(id){
+  if(!confirm('هل تريد حذف المشروع نهائياً مع جميع مهامه؟')) return;
+  const batch=db.batch();
+  tasks.filter(t=>t.projectId===id).forEach(t=>batch.delete(db.collection('tasks').doc(t.id)));
+  batch.delete(db.collection('projects').doc(id));
+  await batch.commit();
+  currentProjectId=null; setView('projects');
+}
+
 document.addEventListener('keydown', e=>{
   if(e.key==='Enter' && e.target && e.target.id==='memberInput'){ e.preventDefault(); addDraftMember(); }
 });
+document.addEventListener('input', e=>{
+  if(e.target.id==='taskSearch'){ filterText=e.target.value; renderBoard(); }
+});
+document.addEventListener('change', e=>{
+  if(e.target.id==='memberFilter'){ filterMember=e.target.value; renderBoard(); }
+});
+
+// ----- السحب والإفلات -----
+document.addEventListener('dragstart', e=>{
+  const t=e.target.closest && e.target.closest('.task'); if(!t || !canEdit()){ return; }
+  dragId=t.dataset.id; t.classList.add('dragging');
+  e.dataTransfer.effectAllowed='move'; try{ e.dataTransfer.setData('text/plain',dragId); }catch(_){}
+});
+document.addEventListener('dragover', e=>{
+  if(!dragId) return; const col=e.target.closest('.col'); if(!col) return;
+  e.preventDefault(); document.querySelectorAll('.col.drop-over').forEach(c=>{ if(c!==col) c.classList.remove('drop-over'); });
+  col.classList.add('drop-over');
+});
+document.addEventListener('drop', e=>{
+  if(!dragId) return; const col=e.target.closest('.col'); if(!col) return; e.preventDefault();
+  const t=tasks.find(x=>x.id===dragId);
+  if(t && canEdit() && t.status!==col.dataset.status) db.collection('tasks').doc(dragId).update({status:col.dataset.status});
+});
+document.addEventListener('dragend', ()=>{
+  dragId=null; document.querySelectorAll('.col.drop-over,.task.dragging').forEach(c=>c.classList.remove('drop-over','dragging'));
+});
+
 document.addEventListener('submit', e=>{
   const form=e.target.closest('[data-form]'); if(!form) return; e.preventDefault();
   const type=form.dataset.form; const fd=new FormData(form);
+
+  if(type==='login'){ handleLogin(fd.get('username'), fd.get('password')); return; }
+  if(!canEdit()){ loginModal(); return; }
+
   if(type==='project'){
     addDraftMember();
     db.collection('projects').add({name:fd.get('name').trim(), members:[...draftMembers], createdAt:Date.now()});
@@ -333,27 +502,58 @@ document.addEventListener('submit', e=>{
     closeModal();
   }
   if(type==='edit-task'){
-    db.collection('tasks').doc(form.dataset.id).update({assignee:fd.get('assignee')||'', dueDate:fd.get('dueDate')||''}); closeModal();
+    db.collection('tasks').doc(form.dataset.id).update({
+      title:fd.get('title').trim(), description:fd.get('description')||'', status:fd.get('status'),
+      assignee:fd.get('assignee')||'', dueDate:fd.get('dueDate')||''
+    }); closeModal();
   }
+  if(type==='admin' && isOwner()){ handleAddAdmin(form, fd.get('username'), fd.get('password')); }
 });
 
-// ---------- init ----------
+async function handleLogin(u,p){
+  u=(u||'').trim(); p=p||'';
+  const err=document.getElementById('loginError');
+  try{
+    if(u.toLowerCase()===OWNER.username && p===OWNER.password){ session={role:'owner',name:'المالك'}; }
+    else{
+      const doc=await db.collection('admins').doc(u.toLowerCase()).get();
+      if(doc.exists && doc.data().password===p) session={role:'admin',name:doc.data().username||u};
+      else { if(err) err.textContent='اسم المستخدم أو كلمة المرور غير صحيحة.'; return; }
+    }
+    saveSession(); closeModal(); setView(view);
+  }catch(ex){ if(err) err.textContent='تعذّر الاتصال بالخادم، حاول مرة أخرى.'; }
+}
+async function handleAddAdmin(form,u,p){
+  const err=document.getElementById('adminError'); err.textContent='';
+  u=(u||'').trim(); p=(p||'').trim();
+  if(!/^[A-Za-z0-9_؀-ۿ.-]+$/.test(u)){ err.textContent='اسم المستخدم يقبل الحروف والأرقام والرموز (_ . -) فقط، دون مسافات.'; return; }
+  if(u.toLowerCase()===OWNER.username){ err.textContent='هذا الاسم محجوز للمالك.'; return; }
+  if(p.length<4){ err.textContent='يجب ألا تقل كلمة المرور عن 4 أحرف.'; return; }
+  try{
+    const ref=db.collection('admins').doc(u.toLowerCase());
+    if((await ref.get()).exists){ err.textContent='هذا الاسم مستخدم من قبل.'; return; }
+    await ref.set({username:u, password:p, createdAt:Date.now()});
+    form.reset(); loadAdminList();
+  }catch(ex){ err.textContent='تعذّر إنشاء الحساب، حاول مرة أخرى.'; }
+}
+
+// ---------- البدء ----------
 function init(){
+  loadSession();
   if(!firebaseConfig.apiKey || firebaseConfig.apiKey==='YOUR_API_KEY'){
+    renderTopbar();
     app.innerHTML='<div class="hint">يجب إضافة إعدادات Firebase أولاً. افتح الملف <code>index.html</code> وعدّل قسم <code>firebaseConfig</code> في أعلى الشيفرة بالقيم المأخوذة من لوحة تحكم Firebase.</div>';
     return;
   }
   firebase.initializeApp(firebaseConfig);
   db = firebase.firestore();
   db.collection('projects').onSnapshot(snap=>{
-    projects = snap.docs.map(d=>({id:d.id, ...d.data()}));
-    if(view==='projects') renderProjects(); if(view==='project') renderProject();
+    projects = snap.docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+    if(view==='projects'||view==='project') renderCurrent();
   });
   db.collection('tasks').onSnapshot(snap=>{
     tasks = snap.docs.map(d=>({id:d.id, ...d.data()}));
-    if(view==='projects') renderProjects();
-    if(view==='project') renderProject();
-    if(view==='calendar') renderCalendar();
+    if(view==='project') renderBoard(); else if(view!=='admins') renderCurrent();
   });
   setView('projects');
 }
