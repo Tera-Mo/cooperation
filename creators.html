@@ -1,0 +1,151 @@
+<!doctype html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>فريق التطوير</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark: #0B0F17;
+  --text-main: #F1F5F9;
+  --text-muted: #64748B;
+  --accent-cool: #38BDF8;
+  --accent-glow: rgba(56, 189, 248, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 60px 24px;
+  width: 100%;
+  flex: 1;
+}
+
+.header {
+  margin-bottom: 70px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent-cool);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  transition: opacity 0.2s;
+}
+
+.back-link:hover {
+  opacity: 0.8;
+}
+
+h1 {
+  font-size: 38px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.5px;
+  color: #FFFFFF;
+}
+
+p.subtitle {
+  color: var(--text-muted);
+  font-size: 16px;
+  margin: 0;
+}
+
+.creators-list {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.creator-item {
+  position: relative;
+  padding-right: 20px;
+  border-right: 2px solid rgba(56, 189, 248, 0.3);
+}
+
+.creator-name {
+  font-size: 32px;
+  font-weight: 700;
+  color: #F8FAFC;
+  margin: 0 0 6px 0;
+  line-height: 1.2;
+}
+
+.creator-role {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--accent-cool);
+  margin: 0;
+}
+
+footer {
+  text-align: center;
+  padding: 40px 24px;
+  color: var(--text-muted);
+  font-size: 13px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <a href="index.html" class="back-link">→ العودة إلى اللوحة</a>
+    <h1>فريق المطورين</h1>
+    <p class="subtitle">العقول والجهود خلف بناء وتطوير المنصة</p>
+  </div>
+
+  <div class="creators-list">
+    <div class="creator-item">
+      <div class="creator-name">محمد عنتر عبدالراضي</div>
+      <div class="creator-role">مطور الواجهة الأمامية (Front-end Developer)</div>
+    </div>
+
+    <div class="creator-item">
+      <div class="creator-name">عبدالعزيز محمد قاسم</div>
+      <div class="creator-role">مصمم واجهة وتجربة المستخدم (UI/UX Designer)</div>
+    </div>
+
+    <div class="creator-item">
+      <div class="creator-name">اسر محمود فتحي</div>
+      <div class="creator-role">كاتب الملاحظات</div>
+    </div>
+
+    <div class="creator-item">
+      <div class="creator-name">محمد سنهوري السيد</div>
+      <div class="creator-role">المدقق و المراجع</div>
+    </div>
+
+
+  </div>
+</div>
+
+<footer>
+  جميع الحقوق محفوظة © لوحة المشاريع
+</footer>
+
+</body>
+</html>

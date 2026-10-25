@@ -137,6 +137,36 @@ h2{font-size:22px;margin:0 0 4px}
 .admin-item:last-child{border-bottom:none}
 ::-webkit-scrollbar{height:8px;width:8px}
 ::-webkit-scrollbar-thumb{background:var(--border); border-radius:4px}
+
+/* ----- زر المطورين الزجاجي ----- */
+.dev-btn {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #E2E8F0;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.dev-btn:hover {
+  transform: scale(1.12);
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(56, 189, 248, 0.6);
+  color: #FFFFFF;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.5), 0 0 40px rgba(56, 189, 248, 0.2);
+}
 </style>
 </head>
 <body>
@@ -147,6 +177,9 @@ h2{font-size:22px;margin:0 0 4px}
 </div>
 <div class="wrap" id="app"></div>
 <div id="modalRoot"></div>
+
+<!-- زر المطورين -->
+<a href="creators.html" class="dev-btn">المطورين</a>
 
 <script>
 /* =======================================================================
